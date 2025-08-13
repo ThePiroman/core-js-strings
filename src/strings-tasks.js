@@ -67,7 +67,7 @@ function isString(value) {
  *   concatenateStrings('', 'bb') => 'bb'
  */
 function concatenateStrings(value1, value2) {
-  return value1 + value2;
+  return value1.concat(value2);
 }
 
 /**
@@ -82,7 +82,7 @@ function concatenateStrings(value1, value2) {
  *   getFirstChar('') => ''
  */
 function getFirstChar(value) {
-  return value[0] || '';
+  return value.charAt(0);
 }
 
 /**
@@ -164,7 +164,9 @@ function repeatString(str, times) {
  *   removeFirstOccurrences('ABABAB', 'BA') => 'ABAB'.
  */
 function removeFirstOccurrences(str, value) {
-  return str.replace(value, '');
+  const index = str.indexOf(value);
+  if (index === -1) return str; // substring not found
+  return str.slice(0, index) + str.slice(index + value.length);
 }
 
 /**
@@ -355,7 +357,7 @@ function orderAlphabetically(str) {
  *   containsSubstring('12345', '34') => true
  */
 function containsSubstring(str, substring) {
-  return str.search(substring) !== -1;
+  return str.includes(substring);
 }
 
 /**
@@ -400,22 +402,12 @@ function countVowels(str) {
  *   isPalindrome('No lemon, no melon') => true
  */
 function isPalindrome(str) {
-  let strReverse = '';
-  for (let i = str.length - 1; i >= 0; ) {
-    strReverse += str[i];
-    i -= 1;
-  }
-  let compareStr = str;
-  strReverse = strReverse.replaceAll(' ', '');
-  compareStr = compareStr.replaceAll(' ', '');
-  strReverse = strReverse.replaceAll(',', '');
-  compareStr = compareStr.replaceAll(',', '');
-
-  if (strReverse.toLowerCase() === compareStr.toLowerCase()) {
-    return true;
-  }
-
-  return false;
+  // Normalize: lowercase and remove non-alphanumeric characters
+  const cleaned = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  // Reverse the cleaned string
+  const reversed = cleaned.split('').reverse().join('');
+  // Compare
+  return cleaned === reversed;
 }
 
 /**
@@ -607,8 +599,11 @@ function extractEmails(str) {
 
   return strReturn;
  */
-function encodeToRot13(/* str */) {
-  throw new Error('Not implemented');
+function encodeToRot13(str) {
+  return str.replace(/[A-Za-z]/g, (char) => {
+    const base = char <= 'Z' ? 65 : 97; // uppercase or lowercase base
+    return String.fromCharCode(((char.charCodeAt(0) - base + 13) % 26) + base);
+  });
 }
 
 /**
@@ -643,7 +638,27 @@ function encodeToRot13(/* str */) {
     return cards.indexOf(value);
  */
 function getCardId(value) {
-  return value;
+  const ranks = [
+    'A',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K',
+  ];
+  const suits = ['♣', '♦', '♥', '♠'];
+
+  const rank = value.slice(0, -1); // everything except last char
+  const suit = value.slice(-1); // last char (symbol)
+
+  return suits.indexOf(suit) * ranks.length + ranks.indexOf(rank);
 }
 
 module.exports = {
